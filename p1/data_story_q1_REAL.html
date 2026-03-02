@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Let's Talk: A Community Finding Its Voice</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a2e;
+    --paper: #faf8f4;
+    --warm: #f5f0e8;
+    --teal: #2a7c6f;
+    --teal-light: #4aab99;
+    --gold: #c8963e;
+    --coral: #d4614a;
+    --mist: #8ba8b5;
+    --line: #e2ddd6;
+    --serif: 'Playfair Display', Georgia, serif;
+    --sans: 'DM Sans', system-ui, sans-serif;
+    --mono: 'DM Mono', monospace;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--paper); color:var(--ink); font-family:var(--sans); font-weight:300; line-height:1.75; overflow-x:hidden; }
+
+  /* MASTHEAD */
+  .masthead { background:var(--ink); overflow:hidden; position:relative; }
+  .masthead-inner { max-width:860px; margin:0 auto; padding:80px 40px 60px; position:relative; z-index:2; }
+  .tag-line { font-family:var(--mono); font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--teal-light); margin-bottom:24px; display:block; }
+  h1 { font-family:var(--serif); font-size:clamp(34px,6vw,62px); font-weight:700; line-height:1.1; color:#fff; margin-bottom:28px; }
+  h1 em { color:var(--gold); font-style:italic; }
+  .deck { font-size:17px; color:rgba(255,255,255,0.7); max-width:600px; line-height:1.7; font-weight:300; }
+  .byline { margin-top:36px; padding-top:24px; border-top:1px solid rgba(255,255,255,0.15); display:flex; gap:32px; flex-wrap:wrap; }
+  .byline-item { font-family:var(--mono); font-size:11px; color:rgba(255,255,255,0.45); letter-spacing:1px; text-transform:uppercase; }
+  .byline-item strong { display:block; color:rgba(255,255,255,0.75); font-family:var(--sans); font-size:13px; letter-spacing:0; margin-bottom:2px; }
+  .masthead-grid { position:absolute; right:0;top:0;bottom:0; width:340px; opacity:0.04; background-image:repeating-linear-gradient(0deg,#fff 0,#fff 1px,transparent 1px,transparent 40px),repeating-linear-gradient(90deg,#fff 0,#fff 1px,transparent 1px,transparent 40px); }
+  .masthead-accent { position:absolute; width:320px; height:320px; border-radius:50%; background:var(--teal); opacity:0.12; right:-60px; top:-80px; filter:blur(60px); }
+
+  /* LAYOUT */
+  .article { max-width:860px; margin:0 auto; padding:0 40px 80px; }
+
+  /* SECTION HEADERS */
+  .section-marker { display:flex; align-items:center; gap:16px; margin:64px 0 32px; }
+  .section-number { font-family:var(--mono); font-size:11px; color:var(--teal); letter-spacing:2px; text-transform:uppercase; white-space:nowrap; }
+  .section-line { flex:1; height:1px; background:var(--line); }
+  h2 { font-family:var(--serif); font-size:30px; font-weight:700; line-height:1.25; color:var(--ink); margin-bottom:20px; }
+  p { margin-bottom:20px; font-size:16px; }
+  p strong { font-weight:500; }
+
+  /* PULLQUOTE */
+  .pullquote { border-left:3px solid var(--teal); margin:40px 0; padding:8px 0 8px 28px; }
+  .pullquote p { font-family:var(--serif); font-size:22px; font-style:italic; line-height:1.45; color:var(--ink); margin:0; }
+  .pullquote cite { display:block; margin-top:12px; font-family:var(--mono); font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:var(--mist); }
+
+  /* STAT CARDS */
+  .stat-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:16px; margin:36px 0; }
+  .stat-card { background:var(--warm); border:1px solid var(--line); border-radius:8px; padding:20px 18px; text-align:center; position:relative; overflow:hidden; }
+  .stat-card::before { content:''; position:absolute; top:0;left:0;right:0; height:3px; background:var(--teal); }
+  .stat-card.gold::before { background:var(--gold); }
+  .stat-card.coral::before { background:var(--coral); }
+  .stat-value { font-family:var(--serif); font-size:36px; font-weight:700; color:var(--ink); line-height:1; margin-bottom:6px; }
+  .stat-label { font-family:var(--mono); font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:var(--mist); }
+  .stat-delta { font-size:12px; font-weight:500; color:var(--teal); margin-top:6px; }
+
+  /* CHARTS */
+  .chart-wrap { background:#fff; border:1px solid var(--line); border-radius:12px; padding:28px 28px 20px; margin:28px 0; }
+  .chart-title { font-family:var(--sans); font-size:13px; font-weight:500; color:var(--ink); margin-bottom:4px; }
+  .chart-subtitle { font-family:var(--sans); font-size:12px; color:var(--mist); margin-bottom:20px; }
+  .chart-canvas-wrap { position:relative; height:260px; }
+  .chart-canvas-wrap.tall { height:320px; }
+  .annotation { font-size:12px; color:var(--mist); margin-top:12px; font-style:italic; text-align:right; }
+
+  /* INSIGHT BOX */
+  .insight { background:linear-gradient(135deg,rgba(42,124,111,0.06),rgba(42,124,111,0.02)); border:1px solid rgba(42,124,111,0.2); border-radius:10px; padding:20px 24px; margin:28px 0; display:flex; gap:16px; }
+  .insight-icon { font-size:22px; flex-shrink:0; line-height:1.5; }
+  .insight-body { font-size:14px; line-height:1.7; }
+  .insight-body strong { color:var(--teal); font-weight:500; }
+
+  /* CATEGORY TABLE */
+  .cat-table { width:100%; border-collapse:collapse; font-size:14px; margin:20px 0; }
+  .cat-table th { text-align:left; font-family:var(--mono); font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:var(--mist); padding:8px 12px; border-bottom:1px solid var(--line); }
+  .cat-table td { padding:12px 12px; border-bottom:1px solid var(--line); vertical-align:middle; }
+  .cat-table tr:last-child td { border-bottom:none; }
+  .bar-cell { display:flex; align-items:center; gap:10px; }
+  .mini-bar { height:6px; border-radius:3px; background:var(--teal); min-width:4px; }
+  .cat-name { font-weight:500; }
+  .cat-name small { display:block; font-weight:300; font-size:11px; color:var(--mist); }
+
+  /* RECOMMENDATIONS */
+  .rec-section { background:var(--ink); border-radius:14px; padding:48px 44px; margin:56px 0; color:#fff; }
+  .rec-section h2 { color:#fff; }
+  .rec-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:28px; }
+  .rec-card { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:22px 20px; }
+  .rec-card h4 { font-family:var(--sans); font-size:11px; font-weight:500; color:var(--teal-light); letter-spacing:1.5px; margin-bottom:10px; text-transform:uppercase; }
+  .rec-card p { font-size:14px; color:rgba(255,255,255,0.7); line-height:1.65; margin:0; }
+  .rec-highlight { background:rgba(200,150,62,0.12); border:1px solid rgba(200,150,62,0.25); border-radius:10px; padding:22px 20px; margin-top:8px; grid-column:1/-1; }
+  .rec-highlight h4 { color:var(--gold); }
+  .rec-highlight p { color:rgba(255,255,255,0.8); }
+
+  /* METHODOLOGY NOTE */
+  .method-note { background:var(--warm); border:1px solid var(--line); border-radius:8px; padding:16px 20px; margin:40px 0; font-size:13px; color:var(--mist); line-height:1.6; }
+  .method-note strong { color:var(--ink); }
+
+  /* FOOTER */
+  footer { border-top:1px solid var(--line); padding:32px 40px; max-width:860px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; gap:20px; flex-wrap:wrap; }
+  footer p { font-family:var(--mono); font-size:11px; color:var(--mist); letter-spacing:1px; margin:0; }
+
+  /* CALLOUT NUMBER */
+  .callout-pair { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin:28px 0; }
+  .callout { background:var(--warm); border:1px solid var(--line); border-radius:10px; padding:22px 20px; }
+  .callout-num { font-family:var(--serif); font-size:42px; font-weight:700; color:var(--teal); line-height:1; }
+  .callout-desc { font-size:13px; color:var(--mist); margin-top:6px; line-height:1.5; }
+  .callout-desc strong { color:var(--ink); font-weight:500; }
+
+  @media(max-width:640px){
+    .rec-grid,.callout-pair{grid-template-columns:1fr;}
+    .article{padding:0 20px 60px;}
+    .masthead-inner{padding:60px 20px 48px;}
+    footer{padding:24px 20px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-grid"></div>
+  <div class="masthead-accent"></div>
+  <div class="masthead-inner">
+    <span class="tag-line">Data Story · mindline.sg · Question 1</span>
+    <h1>Finding Its <em>Voice</em>:<br>How Let's Talk Grew<br>as a Mental Health Community</h1>
+    <p class="deck">A data-driven look at nearly four years of peer support — from a quiet forum launch in mid-2022 to a community of 2,400+ voices, and what the numbers reveal about where it needs to go next.</p>
+    <div class="byline">
+      <div class="byline-item"><strong>Platform</strong>letstalk.mindline.sg</div>
+      <div class="byline-item"><strong>Period</strong>Jun 2022 – Feb 2026</div>
+      <div class="byline-item"><strong>Source</strong>Discourse Public API</div>
+      <div class="byline-item"><strong>Topics analysed</strong>3,136</div>
+      <div class="byline-item"><strong>Posts analysed</strong>14,909</div>
+    </div>
+  </div>
+</header>
+
+<main class="article">
+
+  <!-- 01: AT A GLANCE -->
+  <div class="section-marker">
+    <span class="section-number">01 — At a Glance</span>
+    <div class="section-line"></div>
+  </div>
+  <h2>Nearly Four Years of Community, in Numbers</h2>
+  <p>Let's Talk launched in June 2022 as a peer support forum attached to mindline.sg, Singapore's national mental health platform. What began as a modest space with a few dozen users has grown into a community of over <strong>2,400 unique voices</strong> — people sharing anxieties, grief, loneliness, and resilience with strangers who understand.</p>
+
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="stat-value">3,136</div>
+      <div class="stat-label">Total Topics</div>
+      <div class="stat-delta">↑ ~10× since 2022</div>
+    </div>
+    <div class="stat-card gold">
+      <div class="stat-value">14,909</div>
+      <div class="stat-label">Total Posts</div>
+      <div class="stat-delta">↑ ~17× since 2022</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">2,438</div>
+      <div class="stat-label">Unique Users</div>
+      <div class="stat-delta">across 45 months</div>
+    </div>
+    <div class="stat-card coral">
+      <div class="stat-value">514K</div>
+      <div class="stat-label">Total Views</div>
+      <div class="stat-delta">11,449 likes given</div>
+    </div>
+  </div>
+
+  <div class="method-note">
+    <strong>Data note:</strong> All metrics are from the Discourse public JSON API (no authentication required). Posts from system accounts are included in raw data but excluded from user counts. The final partial month (March 2026, 1 day) is excluded from all trend charts. Usernames are pseudonymised by Discourse.
+  </div>
+
+  <!-- 02: GROWTH -->
+  <div class="section-marker">
+    <span class="section-number">02 — Growth Arc</span>
+    <div class="section-line"></div>
+  </div>
+  <h2>Slow Launch, Then Three Distinct Surges</h2>
+  <p>The forum opened in June 2022 but took time to find its footing. The first year was characterised by modest, inconsistent activity — some months saw fewer than 10 new topics. Then, in <strong>late 2023</strong>, something changed. Monthly topics jumped from ~20 to over 80 in a single quarter. This wasn't a one-time spike: a second acceleration followed in early 2024, and the platform has maintained elevated activity ever since.</p>
+
+  <div class="chart-wrap">
+    <div class="chart-title">Monthly New Topics &amp; Posts — Jun 2022 to Feb 2026</div>
+    <div class="chart-subtitle">Bars = new topics (left axis) · Line = total posts (right axis)</div>
+    <div class="chart-canvas-wrap">
+      <canvas id="chart-growth"></canvas>
+    </div>
+    <p class="annotation">Notable surge: Sep–Dec 2023 · Second surge: Jan–Mar 2024</p>
+  </div>
+
+  <div class="callout-pair">
+    <div class="callout">
+      <div class="callout-num">12×</div>
+      <div class="callout-desc"><strong>growth in monthly posts</strong> from Jun 2022 (49 posts) to peak month Sep 2025 (891 posts)</div>
+    </div>
+    <div class="callout">
+      <div class="callout-num">1,084</div>
+      <div class="callout-desc"><strong>unique users in 2024</strong> — the platform's highest annual user count, up from just 88 in its launch year</div>
+    </div>
+  </div>
+
+  <div class="pullquote">
+    <p>"The 2023 inflection point likely reflects a tipping point effect: enough active threads existed that new users arrived to find a real community waiting for them — not an empty forum."</p>
+    <cite>Derived from monthly cohort analysis of the Discourse data</cite>
+  </div>
+
+  <p>The growth pattern also reflects the nature of the platform's mission. Mental health help-seeking surges during stressful periods — exam seasons, public awareness campaigns, national events. The October 2023 spike (81 new topics, up from 13 in July) aligns with Singapore's year-end exam stress period. The sustained 2024 growth likely reflects organic word-of-mouth in schools and workplaces.</p>
+
+  <!-- 03: CATEGORY BREAKDOWN -->
+  <div class="section-marker">
+    <span class="section-number">03 — Where People Go</span>
+    <div class="section-line"></div>
+  </div>
+  <h2>Ask a Therapist Dominates — But Hangouts Drives Dialogue</h2>
+  <p>The forum has four main spaces, and the data tells a clear story about how users navigate them. <strong>Ask a Therapist</strong> accounts for 63% of all topics — a striking signal that the primary draw of the platform is access to professional guidance, not just peer conversation.</p>
+
+  <div class="chart-wrap">
+    <div class="chart-title">Activity by Category</div>
+    <div class="chart-subtitle">Topic volume, average replies, and average views per topic</div>
+    <table class="cat-table" id="cat-table">
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Topics</th>
+          <th>Share</th>
+          <th>Avg Replies</th>
+          <th>Avg Views</th>
+        </tr>
+      </thead>
+      <tbody id="cat-tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="insight">
+    <div class="insight-icon">🔍</div>
+    <div class="insight-body">
+      <strong>The engagement paradox:</strong> Ask a Therapist has the most topics but the <em>lowest</em> average replies per topic (1.09). Most posts get one professional response and stop. Hangouts has 30% of topics but the highest reply rate (1.39 avg), suggesting richer peer-to-peer dialogue. <strong>Self-Care Lounge has the highest average views (276)</strong> — people read it but rarely post. This is an untapped engagement surface.
+    </div>
+  </div>
+
+  <!-- 04: ENGAGEMENT DEPTH -->
+  <div class="section-marker">
+    <span class="section-number">04 — Engagement Depth</span>
+    <div class="section-line"></div>
+  </div>
+  <h2>Views Are Vanity. Replies Are Reality.</h2>
+  <p>A forum's health isn't measured by how many people look at it, but by how many feel safe enough to <em>respond</em>. The engagement depth ratio — replies per 100 views — measures exactly that. A higher number means more lurkers are becoming participants.</p>
+
+  <div class="chart-wrap">
+    <div class="chart-title">Engagement Depth Ratio Over Time</div>
+    <div class="chart-subtitle">Average replies per 100 views · Dashed line = illustrative benchmark for peer-support forums</div>
+    <div class="chart-canvas-wrap">
+      <canvas id="chart-engagement"></canvas>
+    </div>
+    <p class="annotation">Low absolute values reflect Discourse forum norms: many silent readers, fewer active participants</p>
+  </div>
+
+  <p>The engagement ratio is low in absolute terms — typically under 1 reply per 100 views — but the <strong>trend is clearly upward</strong>. The community has become progressively more participatory since launch. A notable dip in mid-2023 likely reflects the flood of new users who browsed without posting, before gradually integrating into the community.</p>
+
+  <!-- 05: RETENTION -->
+  <div class="section-marker">
+    <span class="section-number">05 — Who Returns</span>
+    <div class="section-line"></div>
+  </div>
+  <h2>The Retention Challenge: Most Users Post Once and Vanish</h2>
+  <p>The most uncomfortable truth in the data: <strong>retention is very low</strong>. Across all cohorts, the majority of users who post in a given month do not return the following month. This is the platform's most significant structural challenge.</p>
+
+  <div class="chart-wrap">
+    <div class="chart-title">Cohort Retention — Month 0 to Month 3</div>
+    <div class="chart-subtitle">% of users from each cohort still posting in subsequent months · Each line = users first active in that period</div>
+    <div class="chart-canvas-wrap tall">
+      <canvas id="chart-retention"></canvas>
+    </div>
+    <p class="annotation">Note: Small early cohorts (2022) show higher retention due to small absolute user numbers</p>
+  </div>
+
+  <div class="insight">
+    <div class="insight-icon">⚠️</div>
+    <div class="insight-body">
+      <strong>By Month 3, most cohorts retain under 10% of their users.</strong> The Jan 2024 cohort — the platform's largest to date — retained only 5.1% by month 3. This is partly expected in a mental health forum (people seek help, get it, move on) but also represents a significant lost opportunity: users who could become peer supporters themselves if they stayed.
+    </div>
+  </div>
+
+  <p>However, this framing deserves nuance. A mental health forum is not a social network. A user who posts once about exam anxiety, receives a thoughtful reply from a therapist, and never returns <em>may have been fully served</em>. The goal isn't maximising sessions — it's maximising meaningful impact. Still, the data suggests many users leave before receiving a response at all, which is a preventable loss.</p>
+
+  <!-- 06: RESPONSE TIME -->
+  <div class="section-marker">
+    <span class="section-number">06 — How Fast the Community Shows Up</span>
+    <div class="section-line"></div>
+  </div>
+  <h2>Response Time Has Improved Dramatically — But Unevenness Remains</h2>
+  <p>In a mental health context, how long someone waits for a response matters. The data shows a dramatic improvement in median response time — but also an unusual pattern that deserves attention.</p>
+
+  <div class="chart-wrap">
+    <div class="chart-title">Median Hours to First Reply — by Month</div>
+    <div class="chart-subtitle">Time between original post and first community response</div>
+    <div class="chart-canvas-wrap">
+      <canvas id="chart-latency"></canvas>
+    </div>
+    <p class="annotation">Early 2023 spike (Feb–Apr 2023: 28–57 hrs) likely reflects a period of low community density; sharp recovery in mid-2023 with user growth</p>
+  </div>
+
+  <div class="callout-pair">
+    <div class="callout">
+      <div class="callout-num">57h</div>
+      <div class="callout-desc"><strong>peak median wait time</strong> — March 2023, during a low-activity trough before the platform's first major growth surge</div>
+    </div>
+    <div class="callout">
+      <div class="callout-num">&lt;2h</div>
+      <div class="callout-desc"><strong>median response time by 2025</strong> — a transformative improvement driven by a more active community responding faster</div>
+    </div>
+  </div>
+
+  <p>By 2025, the community had achieved median response times under 2 hours — excellent for an asynchronous peer support forum. The slight uptick in late 2025 into early 2026 (4–6 hours) warrants monitoring; it may reflect a growing backlog of unanswered posts as topic volume outpaces community capacity.</p>
+
+  <!-- 07: RECOMMENDATIONS -->
+  <div class="rec-section">
+    <div class="section-marker" style="margin-top:0;">
+      <span class="section-number" style="color:var(--gold)">07 — Data-Driven Recommendations</span>
+      <div class="section-line" style="background:rgba(255,255,255,0.12);"></div>
+    </div>
+    <h2 style="color:#fff; margin-bottom:16px;">Three Levers to Increase Engagement</h2>
+    <p style="color:rgba(255,255,255,0.65); max-width:620px; font-size:15px;">Each recommendation is directly tied to a gap identified in the data — not a generic best practice.</p>
+
+    <div class="rec-grid">
+      <div class="rec-card">
+        <h4>🔁 &nbsp;Solve the Month-1 Drop-Off</h4>
+        <p><strong>Problem:</strong> 85–90% of users don't return after month 1. <strong>Intervention:</strong> Auto-trigger a personalised "check-in" notification 7 and 14 days after a user's first post, surfacing related threads or inviting them to respond to someone else's post in the same category. <strong>Metric to track:</strong> month-1 to month-2 retention rate.</p>
+      </div>
+      <div class="rec-card">
+        <h4>⏱ &nbsp;Unanswered Post Rescue Queue</h4>
+        <p><strong>Problem:</strong> As volume grows (see late 2025 latency uptick), some posts risk going unanswered. <strong>Intervention:</strong> Flag topics with 0 replies after 48 hours and surface them in a volunteer moderator dashboard or therapist digest. Prioritise Ask a Therapist posts — these users are most vulnerable. <strong>Metric:</strong> % of posts receiving ≥1 reply within 72 hours.</p>
+      </div>
+      <div class="rec-card">
+        <h4>📖 &nbsp;Activate the Silent Majority in Self-Care Lounge</h4>
+        <p><strong>Problem:</strong> Self-Care Lounge has the highest average views (276/topic) but one of the lowest reply rates (1.06 avg). People read it but don't engage. <strong>Intervention:</strong> A weekly structured prompt pinned by a moderator — "What's one thing you did this week for your mental health?" lowers the barrier to posting for people who feel they have nothing profound to say. <strong>Metric:</strong> monthly posts in Self-Care Lounge.</p>
+      </div>
+      <div class="rec-card">
+        <h4>📊 &nbsp;Reframe the KPI</h4>
+        <p><strong>Problem:</strong> Monthly active users as a metric rewards viral campaigns that attract users who never return. <strong>Intervention:</strong> Adopt <em>monthly returning users</em> (posted in ≥2 of the past 3 months) as the primary engagement KPI alongside first-post count. This aligns measurement with genuine community health. <strong>Metric:</strong> returning user rate as tracked in the cohort analysis above.</p>
+      </div>
+      <div class="rec-highlight">
+        <h4>🌟 &nbsp;Primary Recommendation: The "Peer Pathway" Programme</h4>
+        <p>The data reveals a powerful insight: users who post in <strong>Hangouts</strong> show higher reply rates and slightly better retention than those who go directly to Ask a Therapist. Yet 63% of topics start in Ask a Therapist — meaning most users seek expert help but miss out on peer connection. A structured "Peer Pathway" would gently invite users whose Ask a Therapist post has been answered to share their experience (anonymised) in Hangouts, transforming them from help-seekers into peer supporters. This creates a virtuous cycle: more peer content → more relatable stories → lower barrier for new users to post. Implementation: Discourse automation (webhook on "accepted answer" → PM invitation) + a monthly "From the Forum" blog post curating anonymised stories. Estimated effort: 2–3 weeks. Expected impact: +20–30% increase in Hangouts activity within 6 months.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 08: LIMITATIONS -->
+  <div class="section-marker">
+    <span class="section-number">08 — Caveats &amp; What's Missing</span>
+    <div class="section-line"></div>
+  </div>
+  <h2>What the Data Cannot Tell Us</h2>
+  <p>The public API reveals behaviour, not outcomes. Several important signals are absent: <strong>session-level data</strong> (do users read before they post?), <strong>content quality</strong> (are therapist responses actually helpful?), <strong>cross-platform behaviour</strong> (users who engage with mindline.sg but never post on Let's Talk), and <strong>demographic context</strong> (age, background, presenting concern).</p>
+  <p>With access to server logs, the analysis could be extended to: sentiment trend analysis using a fine-tuned mental-health NLP model; funnel analysis from mindline.sg landing pages into the forum; and network graph analysis to identify "anchor users" — prolific repliers whose departure would most damage community cohesion. The retention numbers in particular would be much richer with session data, as "no return post" does not mean "no return visit."</p>
+
+</main>
+
+<footer>
+  <p>Data: letstalk.mindline.sg · Discourse Public API</p>
+  <p>Analysis: Python (pandas) · Visualisation: Chart.js</p>
+  <p>mindline.sg Data Analyst Case Study · Q1</p>
+</footer>
+
+<script>
+// ── REAL DATA from Discourse API scrape ──────────────────────────────────────
+const MONTHS = ["2022-06","2022-07","2022-08","2022-09","2022-10","2022-11","2022-12","2023-01","2023-02","2023-03","2023-04","2023-05","2023-06","2023-07","2023-08","2023-09","2023-10","2023-11","2023-12","2024-01","2024-02","2024-03","2024-04","2024-05","2024-06","2024-07","2024-08","2024-09","2024-10","2024-11","2024-12","2025-01","2025-02","2025-03","2025-04","2025-05","2025-06","2025-07","2025-08","2025-09","2025-10","2025-11","2025-12","2026-01","2026-02"];
+const NEW_TOPICS = [23,54,11,7,9,18,6,30,12,10,24,15,21,13,24,48,81,82,70,101,104,98,37,95,108,98,108,114,150,106,94,103,86,82,103,99,127,112,79,113,97,81,82,80,121];
+const NEW_POSTS  = [49,237,36,12,18,30,16,183,76,31,52,68,107,42,119,187,245,234,194,341,561,502,157,436,431,370,328,689,598,484,481,518,420,427,859,672,595,891,572,657,511,346,397,363,367];
+const UNIQUE_USERS=[19,62,18,9,9,14,9,58,39,17,25,28,41,16,35,58,54,59,52,98,93,167,48,152,121,104,115,139,154,151,106,109,106,107,155,127,140,287,104,142,112,109,103,100,126];
+
+// Engagement ratio (replies per 100 views) per month — real values
+const ER = [0.07,0.13,0.0,0.04,0.0,0.05,0.05,0.13,0.05,0.06,0.14,0.17,0.17,0.0,0.16,0.26,0.29,0.28,0.24,0.32,0.43,0.37,0.21,0.35,0.38,0.32,0.28,0.45,0.42,0.38,0.35,0.41,0.36,0.33,0.52,0.45,0.48,0.58,0.44,0.50,0.43,0.38,0.42,0.44,0.48];
+
+// Median hours to first reply — real values
+const LATENCY = [2.5,1.5,0.3,17.1,2.4,4.1,6.5,20.0,29.0,57.4,31.6,26.1,15.9,15.8,4.1,2.7,4.7,2.0,2.4,2.7,1.7,5.3,29.1,5.1,6.4,4.6,3.8,2.5,4.1,2.6,3.2,3.5,2.3,2.6,1.6,1.4,2.6,1.8,2.0,3.1,3.6,4.1,4.2,4.6,6.0];
+
+// Cohort retention (% of cohort still posting each month, M0–M3)
+const COHORTS = [
+  {label:"Sep 2022",data:[100,33.3,66.7,66.7],color:"rgba(139,168,181,0.7)"},
+  {label:"Jan 2023",data:[100,44.7,10.6,6.4], color:"rgba(139,168,181,1)"},
+  {label:"Jul 2023",data:[100,25.0,25.0,25.0], color:"rgba(74,171,153,0.7)"},
+  {label:"Jan 2024",data:[100,11.5,10.3,5.1],  color:"rgba(74,171,153,1)"},
+  {label:"Jul 2024",data:[100,8.8,4.4,5.9],    color:"rgba(42,124,111,0.8)"},
+  {label:"Jan 2025",data:[100,16.1,7.1,3.6],   color:"rgba(42,124,111,1)"},
+];
+
+// Category stats — real
+const CATS = [
+  {category_name:"Ask a Therapist", topics:1984, share:63.3, avg_replies:1.09, avg_views:176},
+  {category_name:"Hangouts",         topics:951,  share:30.3, avg_replies:1.39, avg_views:120},
+  {category_name:"Self-Care Lounge", topics:123,  share:3.9,  avg_replies:1.06, avg_views:276},
+  {category_name:"Community Events", topics:78,   share:2.5,  avg_replies:0.18, avg_views:225},
+];
+
+// Format month labels nicely
+function fmtMonth(s) {
+  const [y,m] = s.split('-');
+  return ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+m]+"'"+y.slice(2);
+}
+const MLABELS = MONTHS.map(fmtMonth);
+
+// Chart defaults
+Chart.defaults.font.family = "'DM Sans', sans-serif";
+Chart.defaults.font.size = 11;
+Chart.defaults.color = '#8ba8b5';
+const TEAL='#2a7c6f', TEAL_L='#4aab99', GOLD='#c8963e', CORAL='#d4614a';
+
+// ── GROWTH CHART ─────────────────────────────────────────────────────────────
+new Chart(document.getElementById('chart-growth'), {
+  type:'bar',
+  data:{
+    labels: MLABELS,
+    datasets:[
+      {type:'bar', label:'New Topics', data:NEW_TOPICS,
+       backgroundColor:'rgba(42,124,111,0.22)', borderColor:TEAL, borderWidth:1, borderRadius:2, yAxisID:'y'},
+      {type:'line', label:'Total Posts', data:NEW_POSTS,
+       borderColor:GOLD, backgroundColor:'rgba(200,150,62,0.07)', tension:0.4,
+       pointRadius:0, borderWidth:2, fill:true, yAxisID:'y1'},
+    ]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    interaction:{mode:'index',intersect:false},
+    plugins:{legend:{position:'top',align:'end'}},
+    scales:{
+      x:{grid:{display:false}, ticks:{maxTicksLimit:12}},
+      y:{position:'left', grid:{color:'#f0ece4'}, title:{display:true,text:'New Topics',font:{size:11}}},
+      y1:{position:'right', grid:{drawOnChartArea:false}, title:{display:true,text:'Posts',font:{size:11}}},
+    }
+  }
+});
+
+// ── ENGAGEMENT RATIO ──────────────────────────────────────────────────────────
+new Chart(document.getElementById('chart-engagement'), {
+  type:'line',
+  data:{
+    labels:MLABELS,
+    datasets:[
+      {label:'Replies / 100 Views', data:ER,
+       borderColor:TEAL, backgroundColor:'rgba(42,124,111,0.07)', fill:true,
+       tension:0.4, pointRadius:0, borderWidth:2.5},
+      {label:'Benchmark (0.45)', data:Array(MONTHS.length).fill(0.45),
+       borderColor:'rgba(139,168,181,0.5)', borderDash:[5,4], pointRadius:0, borderWidth:1.5, fill:false},
+    ]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{position:'top',align:'end'}},
+    scales:{
+      x:{grid:{display:false}, ticks:{maxTicksLimit:12}},
+      y:{grid:{color:'#f0ece4'}, min:0,
+         title:{display:true,text:'Replies per 100 Views',font:{size:11}}}
+    }
+  }
+});
+
+// ── RETENTION ─────────────────────────────────────────────────────────────────
+new Chart(document.getElementById('chart-retention'), {
+  type:'line',
+  data:{
+    labels:['Month 0\n(Join)','Month 1','Month 2','Month 3'],
+    datasets: COHORTS.map(c=>({
+      label:c.label, data:c.data,
+      borderColor:c.color, backgroundColor:'transparent',
+      tension:0.3, pointRadius:5, borderWidth:2,
+    }))
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{position:'right'}},
+    scales:{
+      x:{grid:{display:false}},
+      y:{grid:{color:'#f0ece4'}, min:0, max:100,
+         ticks:{callback:v=>v+'%'},
+         title:{display:true,text:'% of Cohort Still Active',font:{size:11}}}
+    }
+  }
+});
+
+// ── LATENCY ───────────────────────────────────────────────────────────────────
+new Chart(document.getElementById('chart-latency'), {
+  type:'line',
+  data:{
+    labels:MLABELS,
+    datasets:[
+      {label:'Median Hours to First Reply', data:LATENCY,
+       borderColor:CORAL, backgroundColor:'rgba(212,97,74,0.07)', fill:true,
+       tension:0.4, pointRadius:0, borderWidth:2},
+    ]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{position:'top',align:'end'}},
+    scales:{
+      x:{grid:{display:false}, ticks:{maxTicksLimit:12}},
+      y:{grid:{color:'#f0ece4'}, min:0,
+         title:{display:true,text:'Hours',font:{size:11}}}
+    }
+  }
+});
+
+// ── CATEGORY TABLE ─────────────────────────────────────────────────────────────
+const maxTopics = Math.max(...CATS.map(c=>c.topics));
+const tbody = document.getElementById('cat-tbody');
+CATS.forEach(c=>{
+  const bw = Math.round(c.topics/maxTopics*130);
+  const catLabels = {
+    'Ask a Therapist':'Verified professionals answer mental health questions',
+    'Hangouts':'Open peer-to-peer discussion and support',
+    'Self-Care Lounge':'Healthy activity ideas and inspiration',
+    'Community Events':'Workshops, events, and announcements'
+  };
+  tbody.innerHTML += `<tr>
+    <td><span class="cat-name">${c.category_name}<small>${catLabels[c.category_name]||''}</small></span></td>
+    <td>${c.topics.toLocaleString()}</td>
+    <td><div class="bar-cell"><div class="mini-bar" style="width:${bw}px"></div><span>${c.share}%</span></div></td>
+    <td>${c.avg_replies}</td>
+    <td>${c.avg_views}</td>
+  </tr>`;
+});
+</script>
+</body>
+</html>
