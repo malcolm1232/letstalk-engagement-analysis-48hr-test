@@ -3,7 +3,7 @@
 
 A data-driven story of how [Let's Talk](https://letstalk.mindline.sg/) has evolved as a peer mental health community since 2022, with 3 actionable recommendations to increase engagement.
 
-🌐 **[View the live data story →](https://github.com/malcolm1232/letstalk-engagement-analysis-48hr-test/blob/main/p1_craft_a_story_BlogStyle/data_story_q1_REAL.html)**
+🌐 [View the live data story →](https://malcolmthl95.wixsite.com/mindlineanalysis)
 
 ---
 
@@ -20,7 +20,7 @@ A data-driven story of how [Let's Talk](https://letstalk.mindline.sg/) has evolv
 
 ---
 
-## How to reproduce
+## How to Reproduce
 
 ```bash
 # 1. Clone the repo
@@ -51,52 +51,57 @@ open index.html
 | Total posts | 14,909 |
 | Unique users | 2,438 |
 | Total views | 514,898 |
-| Topics with zero replies | **66.2%** |
-| Top 20 users' share of all replies | **47.9%** |
-| Peak posting time | **Tuesday 10am SGT** |
+| Topics with zero replies | 66.2% |
+| Top 20 users' share of all replies | 47.9% |
+| Peak posting time | Tuesday 10am SGT |
 
 ---
-based on p2_propose_engagement_increase/Engagement analysis.py
+
 ## 3 Recommendations
 
-**1. Unanswered Post Queue** — 66% of topics get zero replies. Surface unanswered posts to active community members via a moderator digest.
+Based on `scripts/engagement_analysis.py`
 
-**2. Power User Resilience Programme** — Top 10 users drive 36% of all replies. Recruit the next tier (237 users who posted 6–20 times) into a structured peer supporter role before the top tier burns out.
+### 🔴 Solution 1: Fix the Unanswered Post Crisis
 
-**3. Time-Targeted Prompts** — Post moderator prompts on Tuesday at 10am SGT (peak window) and 9pm SGT (underutilised evening peak) to maximise visibility and response rates.
+**The data: 66.2% of all topics receive zero replies** — that's 2,078 out of 3,137 posts. In Ask a Therapist, 65.3% go unanswered. Some of those unanswered posts have massive silent audiences — "Just need someone to talk to" has **1,909 views and 0 replies**. "I'm a failure." has **792 views, 22 likes, and 0 replies**. People are reading but no one is responding.
 
-## 3 Recommendations (indepth)
+**The intervention:** Build an **Unanswered Post Queue** — a dedicated digest surfaced to the 20 anchor users (FuYuan_Affections, CaringBee, Jaws etc.) who currently account for **48% of all replies on the platform**. These users are clearly motivated; they just need visibility into what's fallen through the cracks. Implement via Discourse's existing digest/notification system — no engineering required.
 
-3 Data-Driven Solutions to Increase Engagement
+**Expected impact:** Even converting 20% of unanswered posts to answered would move the platform from 34% reply rate to ~47% — a 38% improvement in the most important trust metric for new users.
 
-🔴 Solution 1: Fix the Unanswered Post Crisis
-The data: 66.2% of all topics receive zero replies — that's 2,078 out of 3,137 posts. In Ask a Therapist, 65.3% go unanswered. Some of those unanswered posts have massive silent audiences — "Just need someone to talk to" has 1,909 views and 0 replies. "I'm a failure." has 792 views, 22 likes, and 0 replies.
-People are reading but no one is responding.
-The intervention: Build an Unanswered Post Queue — a dedicated digest surfaced to the 20 "anchor users" (FuYuan_Affections, CaringBee, Jaws etc.) who currently account for 48% of all replies on the platform. These users are clearly motivated; they just need visibility into what's fallen through the cracks. Implement via Discourse's existing digest/notification system — no engineering required.
-Expected impact: Even converting 20% of unanswered posts to answered would move the platform from 34% reply rate to ~47% — a 38% improvement in the most important trust metric for new users.
-
-🟡 Solution 2: Protect the 92 Power Users Before They Burn Out
-The data: 92 users have posted more than 20 times. The top 10 users alone are responsible for 36% of all replies. The top 20 account for 47.9%. This is extreme concentration — the entire community's responsiveness rests on fewer than 100 people.
-This is a single point of failure. If FuYuan_Affections (842 posts) or CaringBee (678 posts) stops showing up, response rates collapse.
-The intervention: A Peer Supporter Recognition Programme — visible badges, monthly spotlights, and a private "supporter lounge" channel for these users. More importantly, actively recruit the next tier (237 users who posted 6–20 times) into a structured volunteer peer support role with light training and clear boundaries. Discourse supports user groups and trust levels natively — this is a configuration change, not a build.
-Expected impact: Reducing dependency on top 10 users from 36% → 25% of replies by activating the next tier of 237 mid-frequency users, making the community resilient to churn at the top.
-
-🟢 Solution 3: Post on Tuesday at 10am — And Prompt Lurkers at Night
-The data: Posting peaks at 10am–11am SGT on weekdays (1,133 posts at 10am). Weekends drop 30% vs weekdays (Sat/Sun average 1,656 vs weekday average 2,321). But there's a significant secondary evening peak at 9pm–10pm (844 posts at 9pm) — these are likely people processing their day privately, at home, after work or school.
-The intervention: Two targeted nudges:
-
-Moderator-seeded prompts posted Tuesday 9–10am — the highest-traffic window — to maximise visibility and early replies, which drive thread momentum
-Evening "reflection prompts" in Self-Care Lounge posted at 8pm targeting the evening lurker cohort — lower-stakes prompts ("What's one thing that felt hard today?") that match the emotional register of nighttime browsing
-
-Expected impact: Self-Care Lounge currently has the highest avg views (276) but 76.4% unanswered rate — it has a ready audience that just needs a lower barrier to post. Consistent weekly prompts in the right time windows could 2–3× posting frequency in that category with zero technical cost.
 ---
 
-| Solution                     | Data evidence                                   | Effort                         | Expected impact                |
-|------------------------------|--------------------------------------------------|--------------------------------|--------------------------------|
-| Unanswered post queue        | 66% zero-reply rate; 946 high-view unanswered posts | Low (notification config)      | +38% reply coverage            |
-| Protect & grow power users   | Top 20 = 48% of all replies                     | Medium (programme design)      | Community resilience           |
-| Time-targeted prompts        | 10am Tue peak; 9pm evening secondary peak       | Low (editorial calendar)       | 2–3x Self-Care Lounge activity |
+### 🟡 Solution 2: Protect the 92 Power Users Before They Burn Out
 
+**The data: 92 users have posted more than 20 times**. The top 10 users alone are responsible for 36% of all replies. The top 20 account for 47.9%. This is extreme concentration — the entire community's responsiveness rests on fewer than 100 people. 
+
+**This is a single point of failure**. If FuYuan_Affections (842 posts) or CaringBee (678 posts) stops showing up, response rates collapse.
+
+**The intervention: A Peer Supporter Recognition Programme** — visible badges, monthly spotlights, and a private "supporter lounge" channel for these users. More importantly, actively recruit the next tier (237 users who posted 6–20 times) into a structured volunteer peer support role with light training and clear boundaries. Discourse supports user groups and trust levels natively — this is a configuration change, not a build.
+
+**Expected impact:** Reducing dependency on top 10 users from 36% → 25% of replies by activating the next tier of 237 mid-frequency users, making the community resilient to churn at the top.
+
+---
+
+### 🟢 Solution 3: Post on Tuesday at 10am — And Prompt Lurkers at Night
+
+**The data:** Posting peaks at **10am–11am SGT on weekdays** (1,133 posts at 10am). Weekends drop 30% vs weekdays (Sat/Sun average 1,656 vs weekday average 2,321). There is also a significant secondary evening peak at **9pm–10pm** (844 posts at 9pm) — likely people processing their day privately, at home, after work or school.
+
+**The intervention:** Two targeted nudges — (1) **moderator-seeded prompts posted Tuesday 9–10am** to maximise visibility and early replies, which drive thread momentum; (2) **evening "reflection prompts"** in Self-Care Lounge posted at 8pm targeting the evening lurker cohort with lower-stakes questions ("What's one thing that felt hard today?") that match the emotional register of nighttime browsing.
+
+**Expected impact:** Self-Care Lounge currently has the highest avg views (276) but a 76.4% unanswered rate — it has a ready audience that just needs a lower barrier to post. Consistent weekly prompts in the right time windows could 2–3× posting frequency in that category with zero technical cost.
+
+---
+
+### Summary
+
+| Solution | Data evidence | Effort | Expected impact |
+|---|---|---|---|
+| Unanswered post queue | 66% zero-reply rate; 946 high-view unanswered posts | Low (notification config) | +38% reply coverage |
+| Protect & grow power users | Top 20 = 48% of all replies | Medium (programme design) | Community resilience |
+| Time-targeted prompts | 10am Tue peak; 9pm evening secondary peak | Low (editorial calendar) | 2–3× Self-Care Lounge activity |
+
+---
 
 ## Data Source
 
