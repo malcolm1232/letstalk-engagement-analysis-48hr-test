@@ -4,6 +4,13 @@
 A data-driven story of how [Let's Talk](https://letstalk.mindline.sg/) has evolved as a peer mental health community since 2022, with 3 actionable recommendations to increase engagement.
 
 🌐 [View the live data story →](https://malcolmthl95.wixsite.com/mindlineanalysis)
+---
+How I have Strucuted the Question
+Question 1A. 
+Question 1B. 
+
+
+
 
 ---
 
@@ -57,11 +64,11 @@ open index.html
 
 ---
 
-## 3 Recommendations
+## 3 Data-Driven Recommendations To Increase User Engagement
 
 Based on `scripts/engagement_analysis.py`
 
-### 🔴 Solution 1: Fix the Unanswered Post Crisis
+### Solution 1: Fix the Unanswered Post Crisis
 
 **The data: 66.2% of all topics receive zero replies** — that's 2,078 out of 3,137 posts. In Ask a Therapist, 65.3% go unanswered. Some of those unanswered posts have massive silent audiences — "Just need someone to talk to" has **1,909 views and 0 replies**. "I'm a failure." has **792 views, 22 likes, and 0 replies**. People are reading but no one is responding.
 
@@ -71,7 +78,7 @@ Based on `scripts/engagement_analysis.py`
 
 ---
 
-### 🟡 Solution 2: Protect the 92 Power Users Before They Burn Out
+### Solution 2: Protect the 92 Power Users Before They Burn Out
 
 **The data: 92 users have posted more than 20 times**. The top 10 users alone are responsible for 36% of all replies. The top 20 account for 47.9%. This is extreme concentration — the entire community's responsiveness rests on fewer than 100 people. 
 
@@ -83,7 +90,7 @@ Based on `scripts/engagement_analysis.py`
 
 ---
 
-### 🟢 Solution 3: Post on Tuesday at 10am — And Prompt Lurkers at Night
+### Solution 3: Post on Tuesday at 10am — And Prompt Lurkers at Night
 
 **The data:** Posting peaks at **10am–11am SGT on weekdays** (1,133 posts at 10am). Weekends drop 30% vs weekdays (Sat/Sun average 1,656 vs weekday average 2,321). There is also a significant secondary evening peak at **9pm–10pm** (844 posts at 9pm) — likely people processing their day privately, at home, after work or school.
 
@@ -101,7 +108,69 @@ Based on `scripts/engagement_analysis.py`
 | Protect & grow power users | Top 20 = 48% of all replies | Medium (programme design) | Community resilience |
 | Time-targeted prompts | 10am Tue peak; 9pm evening secondary peak | Low (editorial calendar) | 2–3× Self-Care Lounge activity |
 
+## Churn Prediction Model — Question 2
+
+### Features Engineered (10 total)
+
+Features are derived from post history using a **snapshot approach**: all features are computed from data *before* a cutoff date, and the label (churned = 1) is whether the user posted in the 30 days *after* the cutoff.
+
+| Feature | What it captures |
+|---|---|
+| `recency_days` | Days since last post — #1 predictor at 26.8% importance |
+| `posts_per_week` | Posting frequency — #2 at 24.0% |
+| `posts_last30` | Recent activity window — #3 at 11.6% |
+| `days_active` | Platform tenure |
+| `trend` | Last 30 days vs prior 30 days — is activity rising or falling? |
+| `reply_ratio` | Are they a community contributor or just posting their own topics? |
+| `likes_received` | Proxy for feeling valued by the community |
+| `cat_diversity` | How many categories they have posted in — a proxy for embeddedness |
+| `total_posts` | Overall volume of contributions |
+| `posts_prev30` | Activity in the 31–60 day window before snapshot |
+
 ---
+
+### Modelling Approach
+
+Three models were trained and compared using **5-fold stratified cross-validation**. Stratified folds were used to preserve the class ratio across folds, which is critical given the severe class imbalance (97.9% churned vs 2.1% retained). All models used `class_weight='balanced'` to compensate for this imbalance.
+
+| Model | ROC-AUC | F1 | Precision | Recall |
+|---|---|---|---|---|
+| Logistic Regression | **0.895** | 0.919 | 0.993 | 0.856 |
+| Random Forest | 0.836 | 0.988 | 0.984 | **0.992** |
+| Gradient Boosting | 0.828 | 0.987 | 0.985 | 0.989 |
+
+**Recommendation: Logistic Regression for production.**
+
+It achieves the highest ROC-AUC (0.895), meaning it is the best at *ranking* users by churn risk — which is exactly what a moderation team needs to prioritise outreach. It is also fully interpretable: each feature has a signed coefficient, so you can tell a non-technical stakeholder "this user is flagged because they haven't posted in 45 days and their posting rate dropped 60% last month."
+
+---
+
+### Model Evaluation — Why These Metrics
+
+Choosing the right evaluation metric matters because the dataset is heavily imbalanced (98% of users churned). Accuracy alone would be misleading — a model that predicts *everyone* churns would score 97.9% accuracy but be completely useless.
+
+**ROC-AUC (primary metric)**
+Measures how well the model separates churners from retained users across all classification thresholds. A score of 0.895 means the model correctly ranks a churned user above a retained user 89.5% of the time. This is the right primary metric when we want to *rank and prioritise* users for intervention rather than make a hard yes/no prediction.
+
+**Recall (secondary metric)**
+In a mental health context, a **false negative** (missing a user who is about to churn) is more costly than a false positive (flagging someone who would have stayed anyway). High recall ensures we catch as many at-risk users as possible. Random Forest's recall of 0.992 means it misses almost no churners — relevant if the intervention (e.g. a check-in message) is low-cost and low-intrusion.
+
+**Precision**
+Measures what proportion of flagged users actually churn. High precision (0.993 for Logistic Regression) means fewer wasted interventions — important if the outreach involves therapist time, which is a scarce resource.
+
+**F1 Score**
+Harmonic mean of precision and recall. Useful as a single summary metric when both false positives and false negatives carry cost — relevant here because over-messaging users who were fine can feel intrusive and counterproductive in a mental health setting.
+
+---
+
+### Limitations & What Would Improve the Model
+
+The current model is built entirely from **post-level data** because that is all the public API exposes. With access to server-side logs, the following additional features would substantially improve predictive power:
+
+- **Session frequency and duration** — a user who browses daily but no longer posts is a stronger churn signal than post recency alone captures
+- **Read-without-reply behaviour** — users who read threads but stop responding are likely disengaging
+- **Notification open rates** — whether digest emails are being opened
+- **Time-to-first-reply on their posts** — users whose posts go unanswered are more likely to churn (validated in Solution 1 of the engagement analysis)
 
 ## Data Source
 
